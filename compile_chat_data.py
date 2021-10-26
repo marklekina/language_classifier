@@ -1,9 +1,10 @@
 #!/bin/python
-# compile_chat_data.py - update this
-# usage: - update this
-# Mark Lekina Rorat, Thu Sep 23 16:17:32 EDT 2021
+#
+# compile_chat_data.py - read chat data from files in a source directory and compile it into a single .csv file
+#
+# Mark Lekina Rorat, July, Sept, Oct 2021
 
-# import libraries
+
 import os
 import random
 import re

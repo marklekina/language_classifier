@@ -1,7 +1,12 @@
 #!/bin/python
-# classifier.py - update this
-# usage: - update this
-# Mark Lekina Rorat, Thu Sep 23 16:14:01 EDT 2021
+#
+# classifier.py - extracts useful features from mixed language dataset;
+#                 train a Naive Bayes classifier model from extracted features;
+#                 assess the performance of the model (accuracy score, most informative features, classification report);
+#                 display a histogram distribution of the predicted language groupings by mean sentence length.
+#
+# Mark Lekina Rorat, July, Sept, Oct 2021
+
 
 import random
 

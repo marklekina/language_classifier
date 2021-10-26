@@ -1,9 +1,12 @@
 #!/bin/python
-# build_dataset.py - update this
-# usage: - update this
-# Mark Lekina Rorat, Thu Sep 23 16:16:11 EDT 2021
+#
+# build_dataset.py - read data from three language sources (sheng, swahili and english);
+#                    balance and merge the data to create a combined dataset;
+#                    write dataset to .csv file.
+#
+# Mark Lekina Rorat, July, Sept, Oct 2021
 
-# import libraries
+
 import os
 import random
 import re
@@ -19,32 +22,50 @@ english_articles = 117
 random.seed(0)
 
 
-# function to standardize text
+# standardize generic text
 def clean_text(text):
-    text = re.sub(regex, ' ', text)
-    text = " ".join(text.split())
-    text = text.strip().lower()
+    text = re.sub(regex, ' ', text)  # substitute non-alphabetical characters with spaces
+    text = " ".join(text.split())  # remove extra spaces
+    text = text.strip().lower()  # remove newlines from the start and end of the file
     return text
 
 
-# function to preprocess sheng data
+# standardize sheng text
+def clean_sheng_text(text):
+    sheng_regex = r'(([A-Z]+ +)|[A-Z][A-Z]+)|(People Daily)|(([0-9]+/[0-9]+/[0-9]+).+)|(http.+)|(Page .+)|(MANU ' \
+                  r'?SCRIBES|Manu ?scribes)|(URADI|Uradi)|(TAMBU ?LIKA|TAMU ?LIKA|Tamb ?ulika|Tamu ?lika)|(Fomu ?Ni(' \
+                  r'Safi)?\??|FOMU ?NI(SAFI)?\??)|(MANUEL NTOYAI|Manuel Ntoyai)|(NAFSI ?HURU|Nafsi ?Huru)|(([A-Z]+ +)|[' \
+                  r'A-Z][A-Z]+)|(\n)'
+    return re.sub(sheng_regex, ' ', text)
+
+
+# TODO: standardize this function
+# preprocess sheng data
 # read text from each file and clean it
 # return a list of text-label pairs
 def process_sheng_sources(source_dir):
     sheng_pairs = []
     # loop through all files in source_dir
-    sheng_regex = r'(([A-Z]+ +)|[A-Z][A-Z]+)|(People Daily)|(([0-9]+/[0-9]+/[0-9]+).+)|(http.+)|(Page .+)|(MANU ' \
-                  r'?SCRIBES|Manu ?scribes)|(URADI|Uradi)|(TAMBU ?LIKA|TAMU ?LIKA|Tamb ?ulika|Tamu ?lika)|(Fomu ?Ni(' \
-                  r'Safi)?\??|FOMU ?NI(SAFI)?\??)|(MANUEL NTOYAI|Manuel Ntoyai)|(NAFSI ?HURU|Nafsi ?Huru)|(([A-Z]+ +)|[' \
-                  r'A-Z][A-Z]+)|(\n)'
     for filename in os.listdir(source_dir):
         path = os.path.join(source_dir, filename)
         with open(path, 'r') as file:
             text = file.read()
-            text = re.sub(sheng_regex, ' ', text)
+            text = clean_sheng_text(text)
             text = clean_text(text)
             sheng_pairs.append([text, 'sheng'])
     return sheng_pairs
+
+
+# TODO: test generic function
+
+def process_csv_sources(source_path, column, label):
+    pairs = []
+    # read source files
+    df = pd.read_csv(source_path, usecols=column)
+    for index, row in df.iterrows():
+        row = clean_text(row[column])
+        pairs.append([row, label])
+    return pairs
 
 
 # function to preprocess english data
@@ -72,17 +93,6 @@ def process_swahili_sources(source_path):
     return swahili_pairs
 
 
-# function to read labelled chat data
-# return a list of text-label pairs
-def process_chat_data(filename):
-    chat_pairs = []
-    df = pd.read_csv(filename, usecols=['line', 'gold_label'])
-    for index, row in df.iterrows():
-        text, label = row['line'], row['gold_label']
-        chat_pairs.append([text, 'swahili'])
-    return chat_pairs
-
-
 # shuffle and standardize list size
 def balance_data(a_list, threshold):
     random.shuffle(a_list)
@@ -103,13 +113,12 @@ def main():
     sheng_pairs = process_sheng_sources('data/sheng_data')
     swahili_pairs = process_swahili_sources('data/swahili_data/swahili_news.csv')
     english_pairs = process_english_sources('data/english_data/bbc_news.csv')
-    chat_pairs = process_chat_data('data/manually_labelled_chat_data.csv')
 
     # balance and merge pair lists
     sheng_pairs = balance_data(sheng_pairs, sheng_articles)
     swahili_pairs = balance_data(swahili_pairs, swahili_articles)
     english_pairs = balance_data(english_pairs, english_articles)
-    merged_pairs = sheng_pairs + swahili_pairs + english_pairs + chat_pairs
+    merged_pairs = sheng_pairs + swahili_pairs + english_pairs
 
     # shuffle merged pair list and convert to dataframe
     random.shuffle(merged_pairs)

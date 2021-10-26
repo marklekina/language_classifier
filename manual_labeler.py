@@ -1,16 +1,19 @@
 #!/bin/python
-# manual_labeler.py - update this
-# usage: - update this
-# Mark Lekina Rorat, Thu Sep 23 16:19:03 EDT 2021
+#
+# manual_labeler.py - read unlabelled data from a source file;
+#                     display text data line-by-line and prompt user to provide appropriate label;
+#                     write labelled data to a new file.
+#
+# Mark Lekina Rorat, July, Sept, Oct 2021
 
-# import libraries
+
 import random
 import pandas as pd
 from build_dataset import write_to_file
 
 
-# @input: source filename
-# @output: list of lists
+# input: source filename
+# output: list of lists
 # extracts unlabelled data from a .csv file and returns a list-of-lists representation of the data
 
 # read lines from file
@@ -44,8 +47,8 @@ def extract_unlabelled_data(source_filename, threshold=.05):
     return list_of_lists
 
 
-# @input: list of lists
-# @output: labelled list of lists
+# input: list of lists
+# output: labelled list of lists
 # extracts text from a data list, prompts the user to label the text, and returns the labelled data
 
 # print out line and prompt user to enter label (1, 2, 3) for sheng, swahili or english
@@ -54,13 +57,11 @@ def extract_unlabelled_data(source_filename, threshold=.05):
 # return labelled list of lists
 def label_text(list_of_lists):
     labelled_list_of_lists = []
-    print(
-        "Please match the following text with the most appropriate numerical label: (1 -> sheng; 2 -> swahili; 3 -> english)\n")
+    print("Please match the following text with the most appropriate numerical label: (1 -> sheng; 2 -> swahili; 3 -> english)\n")
     for group in list_of_lists:
         value = True
         while value:
             try:
-
                 numerical_label = int(input(group[3] + '\t:\t').strip())
                 value = False
             except ValueError:
